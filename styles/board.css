@@ -1,0 +1,11 @@
+.game-board {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5%;
+}
+
+.square {
+    width: 30%;
+    height: 30%;
+    background-color: beige;
+}
