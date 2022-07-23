@@ -107,10 +107,10 @@ const DisplayController = (() => {
             _squares[i][0].addEventListener('click', () => _toggleSquare(_squares[i][1]));
         };
         _Board.classList.add("display-disabled");
-        //
-
     };
 
+
+    //creates the radio buttons used in the game setup modal
     const _userInput_radioSetup = (name, imgsrc) => {
         let radioRoot = document.createElement("div");
         let selections = [];
@@ -133,12 +133,32 @@ const DisplayController = (() => {
         return radioRoot;
     }
 
-    const _renderGameSetupModal = () => {
-        
 
+    //function renders the game setup modal.
+    //helper function userInput_radioSetup() is used to create radio buttons
+    //state variables _playerOneSvgs & _playerTwoSvgs are used
+    //state variables _playerOneSelection & _playerTwoSelection are eventually set by submitting the form
+    //The following markup is created:
+        /*
+            <div class="modal">                                     * _modal *
+                <h1>Tic-Tac-Toe</h1>
+                <form>                                              * _modal.childNodes[1] *
+                    <div class = "char-select-wrapper">             * _modal.childNodes[1].firstChild *
+                        <div class="radio-char-selection">
+                            * radio buttons are created within _userInput_radioSetup() *
+                        </div>
+                        VS
+                        <div class="radio-char-selection">
+                            * radio buttons are created within _userInput_radioSetup() *
+                        </div>
+                    </div>
+                    <input class="start-round-btn" type="submit"    * _modal.childNodes[1].childNodes[1] *
+                </form>
+            </div>
+        */
+    const _renderGameSetupModal = () => {
         _modal = document.createElement("div");
         _modal.classList.add("modal");
-        
         _modal.appendChild(document.createElement("h1"));
         _modal.firstChild.appendChild(document.createTextNode("Tic-Tac-Toe"));
         _modal.appendChild(document.createElement("form"));
@@ -152,11 +172,12 @@ const DisplayController = (() => {
         _modal.childNodes[1].childNodes[1].type = "submit";
         _modal.childNodes[1].childNodes[1].value = "FIGHT";
         _modal.childNodes[1].childNodes[1].classList.add("start-round-btn");
-
-        _DOM.appendChild(_modal);
-        
+        _DOM.appendChild(_modal);  
     }
 
+    //_submitModal is called when game is started
+    //The players selection (index) is stored within the state variables
+    //The modal display is disabled, and the board display is enabled
     const _submitModal = () => {
         _playerOneSelection = document.querySelector('input[name="P1Sel"]:checked').value;
         _playerTwoSelection = document.querySelector('input[name="P2Sel"]:checked').value;
@@ -166,6 +187,11 @@ const DisplayController = (() => {
         return false;
     }
 
+    //Stores the input DOM_selector inside of _DOM state variable
+    //  _DOM is where the entire game will reside
+    //_Board state variable is filled with a wrapper div and appended to _DOM
+    //Game board is rendered
+    //Setup modal is rendered
     const initBoardDisplay = (DOM_selector) => {
         _DOM = DOM_selector;
         _Board = document.createElement("div");
