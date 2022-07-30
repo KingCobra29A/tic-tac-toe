@@ -1,58 +1,74 @@
 //factory for player objects
-const Player = (marker) => {
+const Player = (name) => {
 
-    let _playerMarker = marker;
-    const debug_printPlayer = () => console.log(_playerMarker);
+    let _playerName = name;
+    let _scoreCard = [false, false, false, false, false, false, false, false, false];
 
-    return {debug_printPlayer};
+    const resetPlayer = () => {
+        _scoreCard = [false, false, false, false, false, false, false, false, false];
+    };
+
+    const printPlayer = () => {
+        return _playerName;
+    };
+
+    const addSelection = (index) => {
+        _scoreCard[index] = true;
+    };
+
+    const checkVictoryConditions = () => {
+        if(
+            (_scoreCard[0] && _scoreCard[1] && _scoreCard[2]) ||
+            (_scoreCard[3] && _scoreCard[4] && _scoreCard[5]) ||
+            (_scoreCard[6] && _scoreCard[7] && _scoreCard[8]) ||
+            (_scoreCard[0] && _scoreCard[3] && _scoreCard[6]) ||
+            (_scoreCard[1] && _scoreCard[4] && _scoreCard[7]) ||
+            (_scoreCard[2] && _scoreCard[5] && _scoreCard[8]) ||
+            (_scoreCard[0] && _scoreCard[4] && _scoreCard[8]) ||
+            (_scoreCard[6] && _scoreCard[4] && _scoreCard[2])) {
+            //console.log(_playerName + " WINS");
+            return true;
+        }
+        return false;
+    };
+
+    return {printPlayer, addSelection, checkVictoryConditions, resetPlayer};
 };
 
 //module for the game board
 const GameBoard = (() => {
 
     let board = [];
-    let Player1;
-    let Player2;
+    let _Players = [Player("Player 1"), Player("Player 2")];
+    let _playerIndex = 0;
 
-    const _resetBoard = () => board = [null, null, null, null, null, null, null, null, null];
-
-    const _initPlayers = () => {
-        Player1 = Player('X');
-        Player2 = Player('O');
-
-        Player1.debug_printPlayer();
-        Player2.debug_printPlayer();
-    }
-
-    const _checkVictoryConditions = (marker) => {
-    //   let mappedBoard = board.map(x => {if(x != marker){x = null;}})
-    //   let nsDiag, snDiag;
-    //   nsDiag = mappedBoard.filter(x =>)
-
-    //   for(i; i<length; i++){
-    //       if
-    //       if (i % 4 == 0){
-    //           if(board[i] == marker) nsDiag++;
-    //       }
-    //       if
-    //   }
-
+    const _resetGame = () => {
+        board = [null, null, null, null, null, null, null, null, null];
+        _Players[0].resetPlayer();
+        _Players[1].resetPlayer();
     };
 
     const pickSquare = (index) => {
         if(board[index] == null){
             board[index] = 'x';
-            return true;
+            _Players[_playerIndex].addSelection(index);
+            if(_Players[_playerIndex].checkVictoryConditions() == true){
+                setTimeout( () => {
+                    console.log(_Players[_playerIndex].printPlayer() + " WINS");
+                    _resetGame();
+                    DisplayController.resetBoardDisplay();
+                }, 0);
+            }
+            _playerIndex = (_playerIndex + 1) % 2;
+            return _playerIndex;
         }
         else{
             console.log("FUDGE OFF");
-            return false;
+            return 2;
         }
     };
 
-    const initGameBoard = () => {
-
-    }
+    const initGameBoard = () => {};
 
     const debug_printBoard = () => console.log(board);
 
@@ -63,7 +79,7 @@ const GameBoard = (() => {
 //module for controlling display to the DOM
 const DisplayController = (() => {
 
-    let _DOMcontainer;
+    let _DOM    ;
     let _modal;
     let _Board;
     let _playerOneSvgs = [
@@ -88,10 +104,22 @@ const DisplayController = (() => {
     //makes a call to the GameBoard module to determine if the picked square is valid
     //based on return from GameBoard, DOM class is applied to DOM square
     const _toggleSquare = (index) => {
-        console.log(index);
-        if(GameBoard.pickSquare(index)){
-            _squares[index][0].classList.add("toggledSquare");
-        }        
+        let pickSquareResult = GameBoard.pickSquare(index);
+        let imageforSquare;
+        if(pickSquareResult == 0){
+            imageforSquare = document.createElement("img");
+            imageforSquare.src = _playerOneSelection;
+            _squares[index][0].appendChild(imageforSquare);
+        }
+        else if(pickSquareResult == 1){
+            imageforSquare = document.createElement("img");
+            imageforSquare.src = _playerTwoSelection;
+            _squares[index][0].appendChild(imageforSquare);
+        }
+        else{
+            //do nothing, square was already picked
+        }
+                
     };
 
     //Generates the html, and applies the classes to render the tictactoe board.
@@ -179,9 +207,8 @@ const DisplayController = (() => {
     //The players selection (index) is stored within the state variables
     //The modal display is disabled, and the board display is enabled
     const _submitModal = () => {
-        _playerOneSelection = document.querySelector('input[name="P1Sel"]:checked').value;
-        _playerTwoSelection = document.querySelector('input[name="P2Sel"]:checked').value;
-        console.log("Player 1 selection: " + _playerOneSelection + " Player 2 selection: " + _playerTwoSelection);
+        _playerOneSelection = _playerOneSvgs[document.querySelector('input[name="P1Sel"]:checked').value];
+        _playerTwoSelection = _playerTwoSvgs[document.querySelector('input[name="P2Sel"]:checked').value];
         _modal.classList.add("display-disabled");
         _Board.classList.remove("display-disabled");
         return false;
@@ -200,7 +227,17 @@ const DisplayController = (() => {
         _renderGameSetupModal();
     };
 
-    return {initBoardDisplay};
+    const resetBoardDisplay = () => {
+        for(let i = 0; i < _squares.length; i++){
+            if(_squares[i][0].firstChild){
+                _squares[i][0].removeChild(_squares[i][0].firstChild);
+            }
+        }
+        _Board.classList.add("display-disabled");
+        _modal.classList.remove("display-disabled");
+    }
+
+    return {initBoardDisplay, resetBoardDisplay};
 
 })();
 
