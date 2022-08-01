@@ -108,11 +108,13 @@ const DisplayController = (() => {
         let imageforSquare;
         if(pickSquareResult == 0){
             imageforSquare = document.createElement("img");
+            imageforSquare.classList.add("selection-image");
             imageforSquare.src = _playerOneSelection;
             _squares[index][0].appendChild(imageforSquare);
         }
         else if(pickSquareResult == 1){
             imageforSquare = document.createElement("img");
+            imageforSquare.classList.add("selection-image");
             imageforSquare.src = _playerTwoSelection;
             _squares[index][0].appendChild(imageforSquare);
         }

@@ -22,11 +22,14 @@ h1 {
 .square {
     width: 30%;
     height: 30%;
-    background-color: beige;
+    background-color: white;
+    display: flex;
 }
 
-.toggledSquare {
-    background-color: brown;
+.selection-image {
+    height: 95%;
+    width: 95%;
+    margin: auto;
 }
 
 .display-disabled {
@@ -67,6 +70,8 @@ form {
 
 .radio-char-selection-square > img {
     margin: auto;
+    height: 95%;
+    width: 95%;
 }
 
 [type=radio] { 
