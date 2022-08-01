@@ -9,14 +9,23 @@
 .modal {
     width:100%;
     height:100%;
-    background-color: azure;
+    background-color: white;
     display: flex;
     flex-direction: column;
     align-items: center;
+    border: 2px solid;
 }
 
 h1 {
-    font-size: 1.5rem;
+    font-size: 4rem;
+    margin: 2rem;
+    font-family: roboto;
+}
+
+h2 {
+    font-family: roboto;
+    font-weight: 600;
+    font-size: 2rem;
 }
 
 .square {
@@ -51,6 +60,21 @@ form {
     justify-content: center;
     align-items: center;
     gap: 2rem;
+}
+
+.player-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.human-computer-sel {
+    width: 15vh;
+    height: 5vh;
+    margin: 1rem auto;
+    border-radius: 0;
+    border: 2px solid;
+    background: none;
+    cursor: pointer;
 }
 
 .radio-char-selection {
@@ -90,5 +114,12 @@ form {
 }
 
 .start-round-btn {
-    width: 6rem;
+    width: 8rem;
+    font-family: roboto;
+    font-weight: 600;
+    font-size: 2rem;
+    border-radius: 0;
+    border: 2px solid;
+    background: none;
+    cursor: pointer;
 }

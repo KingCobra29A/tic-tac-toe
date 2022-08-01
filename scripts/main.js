@@ -159,8 +159,27 @@ const DisplayController = (() => {
         selections[0][1].checked = true;
         radioRoot.classList.add("radio-char-selection");
         
-
         return radioRoot;
+    }
+
+    const _toggleAI_buttonSetup = (name) => {
+        let buttonRoot = document.createElement("input");
+        buttonRoot.classList.add("human-computer-sel");
+        buttonRoot.type = "button";
+        buttonRoot.value = "HUMAN";
+        buttonRoot.name = name;
+        buttonRoot.textContent = "HUMAN";
+        buttonRoot.addEventListener('click', (e) =>{
+            if(e.target.value == "HUMAN"){
+                e.target.value = "COMPUTER";
+                e.target.textContent = "COMPUTER";
+            }
+            else{
+                e.target.value = "HUMAN";
+                e.target.textContent = "HUMAN";
+            }
+        });
+        return buttonRoot;
     }
 
 
@@ -177,7 +196,7 @@ const DisplayController = (() => {
                         <div class="radio-char-selection">
                             * radio buttons are created within _userInput_radioSetup() *
                         </div>
-                        VS
+                        <h2>VS</h2>
                         <div class="radio-char-selection">
                             * radio buttons are created within _userInput_radioSetup() *
                         </div>
@@ -195,9 +214,19 @@ const DisplayController = (() => {
         _modal.childNodes[1].onsubmit = _submitModal;
         _modal.childNodes[1].appendChild(document.createElement("div"));
         _modal.childNodes[1].firstChild.classList.add("char-select-wrapper")
-        _modal.childNodes[1].firstChild.appendChild(_userInput_radioSetup("P1Sel", _playerOneSvgs));
-        _modal.childNodes[1].firstChild.appendChild(document.createTextNode("VS"));
-        _modal.childNodes[1].firstChild.appendChild(_userInput_radioSetup("P2Sel", _playerTwoSvgs));
+        _modal.childNodes[1].firstChild.appendChild(document.createElement("div"));
+        _modal.childNodes[1].firstChild.childNodes[0].classList.add("player-wrapper");
+        _modal.childNodes[1].firstChild.childNodes[0].appendChild(_userInput_radioSetup("P1Sel", _playerOneSvgs));
+        _modal.childNodes[1].firstChild.childNodes[0].appendChild(_toggleAI_buttonSetup("P1SelAI"));
+
+        _modal.childNodes[1].firstChild.appendChild(document.createElement("h2"));
+        _modal.childNodes[1].firstChild.childNodes[1].appendChild(document.createTextNode("VS"));
+
+        _modal.childNodes[1].firstChild.appendChild(document.createElement("div"));
+        _modal.childNodes[1].firstChild.childNodes[2].classList.add("player-wrapper");
+        _modal.childNodes[1].firstChild.childNodes[2].appendChild(_userInput_radioSetup("P2Sel", _playerTwoSvgs));
+        _modal.childNodes[1].firstChild.childNodes[2].appendChild(_toggleAI_buttonSetup("P2SelAI"));
+
         _modal.childNodes[1].appendChild(document.createElement("input"));
         _modal.childNodes[1].childNodes[1].type = "submit";
         _modal.childNodes[1].childNodes[1].value = "FIGHT";
@@ -211,6 +240,9 @@ const DisplayController = (() => {
     const _submitModal = () => {
         _playerOneSelection = _playerOneSvgs[document.querySelector('input[name="P1Sel"]:checked').value];
         _playerTwoSelection = _playerTwoSvgs[document.querySelector('input[name="P2Sel"]:checked').value];
+        //console.log(document.querySelector('input[name="P1SelAI"]'));
+        console.log("Player1: " + document.querySelector('input[name="P1SelAI"]').value);
+        console.log("Player2: " + document.querySelector('input[name="P2SelAI"]').value);
         _modal.classList.add("display-disabled");
         _Board.classList.remove("display-disabled");
         return false;
