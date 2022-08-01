@@ -56,7 +56,8 @@ const GameBoard = (() => {
                 setTimeout( () => {
                     console.log(_Players[_playerIndex].printPlayer() + " WINS");
                     _resetGame();
-                    DisplayController.resetBoardDisplay();
+                    DisplayController.resetBoardDisplay(_playerIndex);
+                    _playerIndex = (_playerIndex + 1) % 2;
                 }, 0);
             }
             else{
@@ -84,9 +85,10 @@ const GameBoard = (() => {
 //module for controlling display to the DOM
 const DisplayController = (() => {
 
-    let _DOM    ;
+    let _DOM;
     let _modal;
     let _Board;
+    let _victoryScreen;
     let _playerOneSvgs = [
         "assets/noun-anaconda-1049196.svg",
         "assets/noun-cane-toad-1049204.svg",
@@ -144,6 +146,27 @@ const DisplayController = (() => {
         _Board.classList.add("display-disabled");
     };
 
+    const _renderVictoryScreen = () => {
+        _victoryScreen = document.createElement("div");
+        _victoryScreen.classList.add("victory-div");
+        _victoryScreen.append(document.createElement("img"));
+        _victoryScreen.childNodes[0].classList.add("victory-image");
+        _victoryScreen.append(document.createElement("h1"));
+        _victoryScreen.childNodes[1].append(document.createTextNode("WINS"));   
+        _victoryScreen.classList.add("display-disabled");
+        _DOM.appendChild(_victoryScreen);     
+    };
+
+    const _setVictory = (player) => {
+        if(player == 0){
+            _victoryScreen.childNodes[0].src = _playerOneSelection;
+        }
+        else{
+            _victoryScreen.childNodes[0].src = _playerTwoSelection;
+        }
+        
+    }
+
 
     //creates the radio buttons used in the game setup modal
     const _userInput_radioSetup = (name, imgsrc) => {
@@ -165,7 +188,7 @@ const DisplayController = (() => {
         radioRoot.classList.add("radio-char-selection");
         
         return radioRoot;
-    }
+    };
 
     const _toggleAI_buttonSetup = (name) => {
         let buttonRoot = document.createElement("input");
@@ -185,7 +208,7 @@ const DisplayController = (() => {
             }
         });
         return buttonRoot;
-    }
+    };
 
 
     //function renders the game setup modal.
@@ -237,7 +260,7 @@ const DisplayController = (() => {
         _modal.childNodes[1].childNodes[1].value = "FIGHT";
         _modal.childNodes[1].childNodes[1].classList.add("start-round-btn");
         _DOM.appendChild(_modal);  
-    }
+    };
 
     //_submitModal is called when game is started
     //The players selection (index) is stored within the state variables
@@ -251,7 +274,7 @@ const DisplayController = (() => {
         _modal.classList.add("display-disabled");
         _Board.classList.remove("display-disabled");
         return false;
-    }
+    };
 
     //Stores the input DOM_selector inside of _DOM state variable
     //  _DOM is where the entire game will reside
@@ -264,17 +287,23 @@ const DisplayController = (() => {
         _DOM.appendChild(_Board);
         _renderBoard();
         _renderGameSetupModal();
+        _renderVictoryScreen();
     };
 
-    const resetBoardDisplay = () => {
+    const resetBoardDisplay = (player) => {
         for(let i = 0; i < _squares.length; i++){
             if(_squares[i][0].firstChild){
                 _squares[i][0].removeChild(_squares[i][0].firstChild);
             }
         }
+        _setVictory(player);
+        _victoryScreen.classList.remove("display-disabled");
         _Board.classList.add("display-disabled");
-        _modal.classList.remove("display-disabled");
-    }
+        setTimeout(() => {
+            _victoryScreen.classList.add("display-disabled");
+            _modal.classList.remove("display-disabled");
+        }, 2000);
+    };
 
     return {initBoardDisplay, resetBoardDisplay};
 

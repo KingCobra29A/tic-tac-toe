@@ -123,3 +123,24 @@ form {
     background: none;
     cursor: pointer;
 }
+
+.victory-div {
+    width:100%;
+    height: 100%;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+}
+
+.victory-image {
+    width: 50%;
+    height: 50%;
+    margin: auto;
+}
+
+.victory-image + h1 {
+    margin: 0 auto auto auto;
+}
+
+
+
