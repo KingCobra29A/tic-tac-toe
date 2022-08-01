@@ -26,7 +26,7 @@ const Player = (name) => {
             (_scoreCard[2] && _scoreCard[5] && _scoreCard[8]) ||
             (_scoreCard[0] && _scoreCard[4] && _scoreCard[8]) ||
             (_scoreCard[6] && _scoreCard[4] && _scoreCard[2])) {
-            //console.log(_playerName + " WINS");
+
             return true;
         }
         return false;
@@ -59,7 +59,12 @@ const GameBoard = (() => {
                     DisplayController.resetBoardDisplay();
                 }, 0);
             }
-            _playerIndex = (_playerIndex + 1) % 2;
+            else{
+                setTimeout( () => {
+                    _playerIndex = (_playerIndex + 1) % 2;
+                }, 0);
+            }
+            
             return _playerIndex;
         }
         else{
