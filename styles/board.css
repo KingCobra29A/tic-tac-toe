@@ -1,9 +1,11 @@
 .game-board {
+    background-color: black;
     width: 100%;
     height: 100%;
     display: flex;
     flex-wrap: wrap;
     gap: 5%;
+    transition: opacity 1s ease;
 }
 
 .modal {
@@ -14,6 +16,7 @@
     flex-direction: column;
     align-items: center;
     border: 2px solid;
+    transition: opacity 1s ease;
 }
 
 h1 {
@@ -128,6 +131,10 @@ form {
     width:100%;
     height: 100%;
     background-color: white;
+    transition: opacity 1s ease;
+}
+
+.flex {
     display: flex;
     flex-direction: column;
 }
@@ -142,5 +149,11 @@ form {
     margin: 0 auto auto auto;
 }
 
+.opacity-zero {
+    opacity: 0;
+}
 
+.opacity-one {
+    opacity: 1;
+}
 

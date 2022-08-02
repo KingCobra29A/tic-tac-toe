@@ -143,6 +143,7 @@ const DisplayController = (() => {
             _Board.appendChild(_squares[i][0]);
             _squares[i][0].addEventListener('click', () => _toggleSquare(_squares[i][1]));
         };
+        _Board.classList.add("opacity-zero");
         _Board.classList.add("display-disabled");
     };
 
@@ -153,8 +154,9 @@ const DisplayController = (() => {
         _victoryScreen.childNodes[0].classList.add("victory-image");
         _victoryScreen.append(document.createElement("h1"));
         _victoryScreen.childNodes[1].append(document.createTextNode("WINS"));   
+        _DOM.appendChild(_victoryScreen);
         _victoryScreen.classList.add("display-disabled");
-        _DOM.appendChild(_victoryScreen);     
+        _victoryScreen.classList.add("opacity-zero");  
     };
 
     const _setVictory = (player) => {
@@ -190,6 +192,7 @@ const DisplayController = (() => {
         return radioRoot;
     };
 
+    //creates the computer/human button for the game setup modal
     const _toggleAI_buttonSetup = (name) => {
         let buttonRoot = document.createElement("input");
         buttonRoot.classList.add("human-computer-sel");
@@ -236,6 +239,7 @@ const DisplayController = (() => {
     const _renderGameSetupModal = () => {
         _modal = document.createElement("div");
         _modal.classList.add("modal");
+        _modal.classList.add("opacity-one");    
         _modal.appendChild(document.createElement("h1"));
         _modal.firstChild.appendChild(document.createTextNode("Tic-Tac-Toe"));
         _modal.appendChild(document.createElement("form"));
@@ -268,11 +272,12 @@ const DisplayController = (() => {
     const _submitModal = () => {
         _playerOneSelection = _playerOneSvgs[document.querySelector('input[name="P1Sel"]:checked').value];
         _playerTwoSelection = _playerTwoSvgs[document.querySelector('input[name="P2Sel"]:checked').value];
-        //console.log(document.querySelector('input[name="P1SelAI"]'));
         console.log("Player1: " + document.querySelector('input[name="P1SelAI"]').value);
         console.log("Player2: " + document.querySelector('input[name="P2SelAI"]').value);
-        _modal.classList.add("display-disabled");
-        _Board.classList.remove("display-disabled");
+
+        _fadeOut(_modal);
+        _fadeIn(_Board);    
+
         return false;
     };
 
@@ -286,24 +291,63 @@ const DisplayController = (() => {
         _Board = document.createElement("div");
         _DOM.appendChild(_Board);
         _renderBoard();
-        _renderGameSetupModal();
         _renderVictoryScreen();
+        _renderGameSetupModal();        
     };
 
+
+    //This function is called by the GameBoard.pickSquare() function when a victory condition is met
+    //resetBoardDisplay handles the end of game screen transitions as well as resetting the game 
     const resetBoardDisplay = (player) => {
-        for(let i = 0; i < _squares.length; i++){
-            if(_squares[i][0].firstChild){
-                _squares[i][0].removeChild(_squares[i][0].firstChild);
-            }
-        }
+
         _setVictory(player);
-        _victoryScreen.classList.remove("display-disabled");
-        _Board.classList.add("display-disabled");
+        
         setTimeout(() => {
-            _victoryScreen.classList.add("display-disabled");
-            _modal.classList.remove("display-disabled");
-        }, 2000);
+            _fadeOut(_Board);
+            _fadeIn(_victoryScreen);
+        }, 200)
+              
+        setTimeout(() => {
+            _fadeOut(_victoryScreen);
+            _fadeIn(_modal);
+        }, 4000);
+
+        setTimeout(() => {
+            for(let i = 0; i < _squares.length; i++){
+                if(_squares[i][0].firstChild){
+                    _squares[i][0].removeChild(_squares[i][0].firstChild);
+                }
+            }
+        }, 4000);
     };
+
+    //This function handles the fadein portion of the screen transitions
+    //used on _Modal, _Board, and _victoryScreen DOM objects
+    const _fadeIn = (dom_object) => {
+        setTimeout(() => {
+            dom_object.classList.remove("display-disabled");
+            if(dom_object.classList.contains("victory-div")){
+                dom_object.classList.add("flex");
+            }
+            setTimeout(() => {
+                dom_object.classList.remove("opacity-zero");
+                dom_object.classList.add("opacity-one");
+            }, 100);            
+        }, 1000);
+    };
+
+    //This function handles the fadeout portion of the screen transitions
+    //used on _Modal, _Board, and _victoryScreen DOM objects
+    const _fadeOut = (dom_object) => {
+        dom_object.classList.remove("opacity-one");
+        dom_object.classList.add("opacity-zero");
+        setTimeout(() => {
+            if(dom_object.classList.contains("victory-div")){
+                dom_object.classList.remove("flex");
+            }
+            dom_object.classList.add("display-disabled");
+        }, 1000);
+    }
 
     return {initBoardDisplay, resetBoardDisplay};
 
