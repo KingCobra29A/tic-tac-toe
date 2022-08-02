@@ -1,16 +1,13 @@
 //factory for player objects
-const Player = (name) => {
+const Player = () => {
 
-    let _playerName = name;
+
     let _scoreCard = [false, false, false, false, false, false, false, false, false];
 
     const resetPlayer = () => {
         _scoreCard = [false, false, false, false, false, false, false, false, false];
     };
 
-    const printPlayer = () => {
-        return _playerName;
-    };
 
     const addSelection = (index) => {
         _scoreCard[index] = true;
@@ -32,14 +29,14 @@ const Player = (name) => {
         return false;
     };
 
-    return {printPlayer, addSelection, checkVictoryConditions, resetPlayer};
+    return {addSelection, checkVictoryConditions, resetPlayer};
 };
 
 //module for the game board
 const GameBoard = (() => {
 
-    let board = [];
-    let _Players = [Player("Player 1"), Player("Player 2")];
+    let board = [null, null, null, null, null, null, null, null, null];
+    let _Players = [Player(), Player()];
     let _playerIndex = 0;
 
     const _resetGame = () => {
@@ -48,13 +45,16 @@ const GameBoard = (() => {
         _Players[1].resetPlayer();
     };
 
+    const _checkForTie = () => {
+        return board.includes(null);
+    };
+
     const pickSquare = (index) => {
         if(board[index] == null){
             board[index] = 'x';
             _Players[_playerIndex].addSelection(index);
             if(_Players[_playerIndex].checkVictoryConditions() == true){
                 setTimeout( () => {
-                    console.log(_Players[_playerIndex].printPlayer() + " WINS");
                     _resetGame();
                     DisplayController.resetBoardDisplay(_playerIndex);
                     _playerIndex = (_playerIndex + 1) % 2;
@@ -63,6 +63,12 @@ const GameBoard = (() => {
             else{
                 setTimeout( () => {
                     _playerIndex = (_playerIndex + 1) % 2;
+                }, 0);
+                setTimeout(() => {
+                    if(_checkForTie() == false){
+                        _resetGame();
+                        DisplayController.resetBoardDisplay(69);
+                    }
                 }, 0);
             }
             
@@ -101,6 +107,7 @@ const DisplayController = (() => {
         "assets/noun-fish-3625679.svg",
         "assets/noun-hamster-3625680.svg"
     ];
+    let _tieImage = "assets/noun-garbage-5038604.svg";
 
     let _playerOneSelection, _playerTwoSelection;
 
@@ -159,12 +166,19 @@ const DisplayController = (() => {
         _victoryScreen.classList.add("opacity-zero");  
     };
 
+    //modifies the victory screen to either display the corrent winner, or to display a tie
     const _setVictory = (player) => {
         if(player == 0){
             _victoryScreen.childNodes[0].src = _playerOneSelection;
+            _victoryScreen.childNodes[1].innerText = "WINS";
+        }
+        else if(player == 1){
+            _victoryScreen.childNodes[0].src = _playerTwoSelection;
+            _victoryScreen.childNodes[1].innerText = "WINS";
         }
         else{
-            _victoryScreen.childNodes[0].src = _playerTwoSelection;
+            _victoryScreen.childNodes[0].src = _tieImage;
+            _victoryScreen.childNodes[1].innerText = "TIE";
         }
         
     }
