@@ -53,7 +53,8 @@ const GameBoard = (() => {
     let board = [null, null, null, null, null, null, null, null, null];
     let _Players
     let _playerIndex = 0;
-    let compSpeed = 300;
+    let _compSpeed = 1000;
+    let _disableMoves = false;
 
     const _resetGame = () => {
         board = [null, null, null, null, null, null, null, null, null];
@@ -65,11 +66,16 @@ const GameBoard = (() => {
         return board.includes(null);
     };
 
-    const pickSquare = (index) => {
-        if(board[index] == null){
+    const pickSquare = (index, clickedByHuman) => {
+        if(_disableMoves){
+            console.log("FUDGE OFF");
+            return 2;
+        }
+        else if(board[index] == null){
             board[index] = 'x';
             _Players[_playerIndex].addSelection(index);
             if(_Players[_playerIndex].checkVictoryConditions() == true){
+                _disableMoves = true;
                 setTimeout( () => {
                     _resetGame();
                     DisplayController.resetBoardDisplay(_playerIndex);
@@ -80,13 +86,16 @@ const GameBoard = (() => {
                 setTimeout( () => {
                     _playerIndex = (_playerIndex + 1) % 2;
                     if(_Players[_playerIndex].isComp()){
+                        _disableMoves = true;
                         setTimeout(() => {
+                            _disableMoves = false;
                             _Players[_playerIndex].takeMove(board);
-                        }, compSpeed);
+                        }, _compSpeed);
                     }
                 }, 0);
                 setTimeout(() => {
                     if(_checkForTie() == false){
+                        _disableMoves = true;
                         _resetGame();
                         DisplayController.resetBoardDisplay(69);
                     }
@@ -103,10 +112,13 @@ const GameBoard = (() => {
 
     const initPlayerStatus = (p1, p2) => {
         _Players = [Player(p1), Player(p2)];
+        _disableMoves = false;
         if(_Players[_playerIndex].isComp()){
+            _disableMoves = true;
             setTimeout(() => {
+                _disableMoves = false;
                 _Players[_playerIndex].takeMove(board);
-            }, compSpeed);
+            }, _compSpeed * 2);
         }
     };
 
