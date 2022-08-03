@@ -1,6 +1,7 @@
 //factory for player objects
-const Player = () => {
+const Player = (ComputerStatus) => {
 
+    let isComputer = ComputerStatus;
 
     let _scoreCard = [false, false, false, false, false, false, false, false, false];
 
@@ -29,15 +30,30 @@ const Player = () => {
         return false;
     };
 
-    return {addSelection, checkVictoryConditions, resetPlayer};
+    const isComp = () => {
+        return isComputer;
+    };
+
+    const takeMove = (currentBoard) => {
+        let i;
+        for(i = 0; i < currentBoard.length; i++){
+            if(currentBoard[i] == null){
+                break;
+            }
+        }
+        (document.querySelector(".game-board")).childNodes[i].click();
+    };
+
+    return {addSelection, checkVictoryConditions, resetPlayer, isComp, takeMove};
 };
 
 //module for the game board
 const GameBoard = (() => {
 
     let board = [null, null, null, null, null, null, null, null, null];
-    let _Players = [Player(), Player()];
+    let _Players
     let _playerIndex = 0;
+    let compSpeed = 300;
 
     const _resetGame = () => {
         board = [null, null, null, null, null, null, null, null, null];
@@ -63,6 +79,11 @@ const GameBoard = (() => {
             else{
                 setTimeout( () => {
                     _playerIndex = (_playerIndex + 1) % 2;
+                    if(_Players[_playerIndex].isComp()){
+                        setTimeout(() => {
+                            _Players[_playerIndex].takeMove(board);
+                        }, compSpeed);
+                    }
                 }, 0);
                 setTimeout(() => {
                     if(_checkForTie() == false){
@@ -80,11 +101,17 @@ const GameBoard = (() => {
         }
     };
 
-    const initGameBoard = () => {};
+    const initPlayerStatus = (p1, p2) => {
+        _Players = [Player(p1), Player(p2)];
+        if(_Players[_playerIndex].isComp()){
+            setTimeout(() => {
+                _Players[_playerIndex].takeMove(board);
+            }, compSpeed);
+        }
+    };
 
-    const debug_printBoard = () => console.log(board);
 
-    return {debug_printBoard, pickSquare};
+    return {pickSquare, initPlayerStatus};
 
 })();
 
@@ -286,9 +313,11 @@ const DisplayController = (() => {
     const _submitModal = () => {
         _playerOneSelection = _playerOneSvgs[document.querySelector('input[name="P1Sel"]:checked').value];
         _playerTwoSelection = _playerTwoSvgs[document.querySelector('input[name="P2Sel"]:checked').value];
-        console.log("Player1: " + document.querySelector('input[name="P1SelAI"]').value);
-        console.log("Player2: " + document.querySelector('input[name="P2SelAI"]').value);
 
+        let p1IsComp = (document.querySelector('input[name="P1SelAI"]').value == "COMPUTER") ? true : false;
+        let p2IsComp = (document.querySelector('input[name="P2SelAI"]').value == "COMPUTER") ? true : false;
+        GameBoard.initPlayerStatus(p1IsComp, p2IsComp);
+        
         _fadeOut(_modal);
         _fadeIn(_Board);    
 
@@ -298,8 +327,9 @@ const DisplayController = (() => {
     //Stores the input DOM_selector inside of _DOM state variable
     //  _DOM is where the entire game will reside
     //_Board state variable is filled with a wrapper div and appended to _DOM
-    //Game board is rendered
+    //Game board is rendered and disabled
     //Setup modal is rendered
+    //Victory screen is rendered and disabled
     const initBoardDisplay = (DOM_selector) => {
         _DOM = DOM_selector;
         _Board = document.createElement("div");
