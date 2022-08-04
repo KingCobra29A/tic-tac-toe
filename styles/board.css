@@ -175,4 +175,11 @@ form {
         margin: 0.5rem auto;
     }
 
+    .radio-char-selection {
+        height: 30vw;
+        width: 30vw;
+        gap: 10%;
+        margin: auto;
+    }
+
 }
