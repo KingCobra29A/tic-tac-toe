@@ -183,4 +183,9 @@ form {
         margin: auto;
     }
 
+    .human-computer-sel {
+        width: 20vw;
+        height: 5vh;
+    }
+
 }
