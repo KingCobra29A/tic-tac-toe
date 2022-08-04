@@ -162,6 +162,7 @@ form {
 @media only screen and (max-width: 600px) {
 
     h1{
+        font-weight: 600;
         font-size: 2rem;
         margin: 1rem;
     }
@@ -178,7 +179,7 @@ form {
     .radio-char-selection {
         height: 30vw;
         width: 30vw;
-        gap: 10%;
+        gap: 5%;
         margin: auto;
     }
 
