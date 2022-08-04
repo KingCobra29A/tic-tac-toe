@@ -18,7 +18,7 @@ header {
 
 @media only screen and (max-width: 600px) {
     .game-board-location {
-        width: 95vw;
-        height: 115vw;
+        width: 90vw;
+        height: 90vw;
     }
 }

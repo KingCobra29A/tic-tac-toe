@@ -157,3 +157,22 @@ form {
     opacity: 1;
 }
 
+
+
+@media only screen and (max-width: 600px) {
+
+    h1{
+        font-size: 2rem;
+        margin: 1rem;
+    }
+
+    .char-select-wrapper {
+        margin: 1rem 0 1rem 0;
+        gap: 1rem;
+    }
+
+    .human-computer-sel {
+        margin: 0.5rem auto;
+    }
+
+}
