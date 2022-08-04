@@ -1,12 +1,17 @@
-//factory for player objects
-const Player = (ComputerStatus) => {
 
-    let isComputer = ComputerStatus;
+/****************************** PLAYER **************************************/
+
+//factory for player objects
+const Player = (id) => {
+
+    let _playerID = id;
+    let _isComputer = false;
 
     let _scoreCard = [false, false, false, false, false, false, false, false, false];
 
-    const resetPlayer = () => {
+    const resetPlayer = (compStatus) => {
         _scoreCard = [false, false, false, false, false, false, false, false, false];
+        _isComputer = compStatus;
     };
 
 
@@ -14,6 +19,9 @@ const Player = (ComputerStatus) => {
         _scoreCard[index] = true;
     };
 
+    //Used after each selection is made during GameBoard.pickSquare()
+    //returns true if the player has a winning _scoreCard
+    //returns false otherwise
     const checkVictoryConditions = () => {
         if(
             (_scoreCard[0] && _scoreCard[1] && _scoreCard[2]) ||
@@ -30,88 +38,202 @@ const Player = (ComputerStatus) => {
         return false;
     };
 
+    //Used during GameBoard.initPlayerStatus() and GameBoard.pickSquare()
+    //  to determine if the computers next turn should be scheduled
+    //returns true if the player is a computer, and false otherwise
     const isComp = () => {
-        return isComputer;
+        return _isComputer;
     };
 
+    //Used by computer players to determine the optimal move, and then take it
     const takeMove = (currentBoard) => {
-        let i;
-        for(i = 0; i < currentBoard.length; i++){
+        let moveIndex;
+        let moveScore = -1000;
+        let movesLeft = 0;
+        //determine current depth of input board
+        for(let i = 0; i < 9; i++){
+            if (currentBoard[i] == null) movesLeft +=1;
+        }
+        //calls _minimax() on each possible move to determine index of the best available move
+        for(let i = 0; i < 9; i++){
             if(currentBoard[i] == null){
-                break;
+                let tempBoard = currentBoard.slice();
+                tempBoard[i] = _playerID;
+                let tempScore = _minimax(tempBoard, movesLeft-1, false);
+                if(tempScore > moveScore){
+                    moveIndex = i;
+                    moveScore = tempScore;
+                }
             }
         }
-        (document.querySelector(".game-board")).childNodes[i].click();
+        _clickOnSquareAtIndex(moveIndex);
     };
+
+    //helper function for takeMove
+    //clicks on the tic-tac-toe square at the input index
+    const _clickOnSquareAtIndex = (index) => {
+        (document.querySelector(".game-board")).childNodes[index].click();
+    };
+
+    //helper function for takeMove
+    //decides the optimal square to click on for the AI
+    const _minimax = (node, depth, maximizingPlayer) => {
+        let nodeValue = _evaluate(node);
+        if(depth == 0 || nodeValue != 69){
+            return nodeValue;
+        }
+        if(maximizingPlayer){
+            value = -Infinity;
+            for(let i = 0; i < 9; i++){
+                if(node[i] == null){
+                    let tempBoard = node.slice();
+                    tempBoard[i] = _playerID;
+                    value = Math.max(value, _minimax(tempBoard, depth-1, false));
+                }
+            }
+            return value;
+        }
+        else{
+            value = Infinity;
+            for(let i = 0; i < 9; i++){
+                if(node[i] == null){
+                    let tempBoard = node.slice();
+                    tempBoard[i] = (_playerID + 1) % 2;
+                    value = Math.min(value, _minimax(tempBoard, depth-1, true));
+                }
+            }
+            return value;
+        }
+    };
+
+
+    //helper function for _minimax
+    //returns the heuristic value of the input game board
+    const _evaluate = (inputBoard) => {
+        //row condition
+        for(let i = 0; i < 9;){
+            if((inputBoard[i] != null) && (inputBoard[i] == inputBoard[i+1]) && (inputBoard[i] == inputBoard[i+2])){
+                return (inputBoard[i] == _playerID) ? 10 : -10;
+            }
+            i = i + 3;
+        }
+        //column condition
+        for(let i = 0; i < 3; i++){
+            if((inputBoard[i] != null) && (inputBoard[i] == inputBoard[i+3]) && (inputBoard[i] == inputBoard[i+6])){
+                return (inputBoard[i] == _playerID) ? 10 : -10;
+            }
+        }
+        //diag condition (top down)
+        if((inputBoard[0] != null) && (inputBoard[0] == inputBoard[4]) && (inputBoard[0] == inputBoard[8])){
+            return (inputBoard[0] == _playerID) ? 10 : -10;
+        }
+        //diag condition (bottom up)
+        if((inputBoard[6] != null) && (inputBoard[6] == inputBoard[4]) && (inputBoard[6] == inputBoard[2])){
+            return (inputBoard[6] == _playerID) ? 10 : -10;
+        }
+        //tie condition
+        if(!inputBoard.includes(null)){
+            return 0;
+        }
+        //board has not yet reached a win/loss/tie
+        return 69;
+    };
+
 
     return {addSelection, checkVictoryConditions, resetPlayer, isComp, takeMove};
 };
+
+
+
+/****************************** GAME BOARD **************************************/
+
 
 //module for the game board
 const GameBoard = (() => {
 
     let board = [null, null, null, null, null, null, null, null, null];
-    let _Players
+    let _Players = [Player(0), Player(1)];
     let _playerIndex = 0;
     let _compSpeed = 1000;
     let _disableMoves = false;
 
+    //reset both players and gameboard
     const _resetGame = () => {
         board = [null, null, null, null, null, null, null, null, null];
-        _Players[0].resetPlayer();
-        _Players[1].resetPlayer();
+        _Players[0].resetPlayer(false);
+        _Players[1].resetPlayer(false);
     };
 
+    //returns true if there are no more valid moves available
     const _checkForTie = () => {
-        return board.includes(null);
+        return !board.includes(null);
     };
 
-    const pickSquare = (index, clickedByHuman) => {
+    //This function is used by the event listeners on each square
+    //Returns _playerIndex (0 or 1) if the move was valid
+    //Returns 2 if the move was invalid
+    const pickSquare = (index) => {
+        //Move was invalid (it is not a human players turn, but was clicked by human)
         if(_disableMoves){
-            console.log("FUDGE OFF");
             return 2;
         }
+        //it is a human players turn, and the square is not already taken
         else if(board[index] == null){
-            board[index] = 'x';
+            //add the selection to the board and the players score card
+            board[index] = _playerIndex;
             _Players[_playerIndex].addSelection(index);
+            //check to see if the move resulted in a victory
             if(_Players[_playerIndex].checkVictoryConditions() == true){
+                //the player won, prevent any further moves
                 _disableMoves = true;
+                //setTimeout 0, so that the display controller can change the DOM before we reset the game
                 setTimeout( () => {
+                    //reset gameboard and players
                     _resetGame();
+                    //initiate end of game display sequence + reset
                     DisplayController.resetBoardDisplay(_playerIndex);
                     _playerIndex = (_playerIndex + 1) % 2;
                 }, 0);
             }
+            //move did not result in a victory condition
             else{
-                setTimeout( () => {
-                    _playerIndex = (_playerIndex + 1) % 2;
-                    if(_Players[_playerIndex].isComp()){
-                        _disableMoves = true;
-                        setTimeout(() => {
-                            _disableMoves = false;
-                            _Players[_playerIndex].takeMove(board);
-                        }, _compSpeed);
-                    }
-                }, 0);
+                //setTimeout 0, so that the display controller can change the DOM before we check for a tie / continue
                 setTimeout(() => {
-                    if(_checkForTie() == false){
+                    if(_checkForTie() == true){
                         _disableMoves = true;
                         _resetGame();
                         DisplayController.resetBoardDisplay(69);
+                        _playerIndex = (_playerIndex + 1) % 2;
+                    }
+                    else{
+                        //start the next players turn
+                        _playerIndex = (_playerIndex + 1) % 2;
+                        //if the current player is a computer, schedule the computers next turn
+                        if(_Players[_playerIndex].isComp()){
+                            _disableMoves = true;
+                            setTimeout(() => {
+                                _disableMoves = false;
+                                _Players[_playerIndex].takeMove(board);
+                            }, _compSpeed);
+                        }
                     }
                 }, 0);
             }
             
             return _playerIndex;
         }
+        //Move was invalid (already taken)
         else{
-            console.log("FUDGE OFF");
             return 2;
         }
     };
 
+    //Used by DisplayController._submitModal()
+    //Resets both players & sets the players' computer status
+    //if player 0 is a computer, their first move is scheduled
     const initPlayerStatus = (p1, p2) => {
-        _Players = [Player(p1), Player(p2)];
+        _Players[0].resetPlayer(p1);
+        _Players[1].resetPlayer(p2);
         _disableMoves = false;
         if(_Players[_playerIndex].isComp()){
             _disableMoves = true;
@@ -126,6 +248,11 @@ const GameBoard = (() => {
     return {pickSquare, initPlayerStatus};
 
 })();
+
+
+
+/****************************** DISPLAY CONTROLLER **************************************/
+
 
 //module for controlling display to the DOM
 const DisplayController = (() => {
@@ -178,7 +305,7 @@ const DisplayController = (() => {
     };
 
     //Generates the html, and applies the classes to render the tictactoe board.
-    //applies a click-based event listener on each square, which calls _toggleSquare
+    //applies click-based event listeners on each square, which call _toggleSquare
     const _renderBoard = () => {
 
         _Board.classList.add("game-board");
@@ -193,6 +320,16 @@ const DisplayController = (() => {
         _Board.classList.add("display-disabled");
     };
 
+    //Called once initBoardDisplay to generate the html + apply css for the victory screen
+    //The following markup is created:
+    //<div class="victory-div">
+    //      <img class="victory-image">
+    //          //Victory image src is set later by _setVictory()
+    //      </img>
+    //      <h1>
+    //          // either "WINS" or "TIE", set later by _seVictory()
+    //      </h1>
+    //</div>
     const _renderVictoryScreen = () => {
         _victoryScreen = document.createElement("div");
         _victoryScreen.classList.add("victory-div");
@@ -224,6 +361,7 @@ const DisplayController = (() => {
 
 
     //creates the radio buttons used in the game setup modal
+    //is called twice during _renderGameSetupModal()
     const _userInput_radioSetup = (name, imgsrc) => {
         let radioRoot = document.createElement("div");
         let selections = [];
@@ -246,6 +384,8 @@ const DisplayController = (() => {
     };
 
     //creates the computer/human button for the game setup modal
+    //is called twice during _renderGameSetupModal()
+    //adds an eventlistener to the button to toggle between the states "HUMAN" & "COMPUTER"    
     const _toggleAI_buttonSetup = (name) => {
         let buttonRoot = document.createElement("input");
         buttonRoot.classList.add("human-computer-sel");
