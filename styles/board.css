@@ -157,7 +157,17 @@ form {
     opacity: 1;
 }
 
+.button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
 
+.input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
 
 @media only screen and (max-width: 600px) {
 
@@ -197,11 +207,4 @@ form {
         width: 90%;
     }
 
-    .button {
-        -webkit-appearance: none;
-    }
-
-    .input {
-        -webkit-appearance: none;
-    }
 }
