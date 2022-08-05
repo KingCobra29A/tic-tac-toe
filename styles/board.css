@@ -176,7 +176,6 @@ form {
         margin: 0.5rem auto;
         width: 90%;
         padding: 0;
-        --webkit-appearance: none;
     }
 
     .radio-char-selection {
@@ -198,7 +197,11 @@ form {
         width: 90%;
     }
 
-    .start-round-btn {
+    .button {
+        --webkit-appearance: none;
+    }
+
+    .input {
         --webkit-appearance: none;
     }
 }
