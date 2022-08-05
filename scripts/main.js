@@ -48,7 +48,7 @@ const Player = (id) => {
     //Used by computer players to determine the optimal move, and then take it
     const takeMove = (currentBoard) => {
         let moveIndex;
-        let moveScore = -1000;
+        let moveScore = -Infinity;
         let movesLeft = 0;
         //determine current depth of input board
         for(let i = 0; i < 9; i++){
@@ -80,7 +80,7 @@ const Player = (id) => {
     const _minimax = (node, depth, maximizingPlayer) => {
         let nodeValue = _evaluate(node);
         if(depth == 0 || nodeValue != 69){
-            return nodeValue;
+            return (maximizingPlayer == true) ? nodeValue-depth : nodeValue+depth;
         }
         if(maximizingPlayer){
             value = -Infinity;
