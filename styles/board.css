@@ -198,10 +198,10 @@ form {
     }
 
     .button {
-        --webkit-appearance: none;
+        -webkit-appearance: none;
     }
 
     .input {
-        --webkit-appearance: none;
+        -webkit-appearance: none;
     }
 }
