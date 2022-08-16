@@ -78,6 +78,7 @@ form {
     border: 2px solid;
     background: none;
     cursor: pointer;
+    color: black;
 }
 
 .radio-char-selection {
@@ -125,6 +126,7 @@ form {
     border: 2px solid;
     background: none;
     cursor: pointer;
+    color: black;
 }
 
 .victory-div {
