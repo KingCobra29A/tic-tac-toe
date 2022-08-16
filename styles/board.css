@@ -127,6 +127,7 @@ form {
     background: none;
     cursor: pointer;
     color: black;
+    padding: 0;
 }
 
 .victory-div {
