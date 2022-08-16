@@ -157,13 +157,13 @@ form {
     opacity: 1;
 }
 
-.button {
+button {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
 }
 
-.input {
+input {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
